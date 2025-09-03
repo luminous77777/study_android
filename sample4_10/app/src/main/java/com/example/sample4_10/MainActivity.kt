@@ -1,9 +1,13 @@
 package com.example.sample4_10
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,7 +25,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         var web1: WebView = findViewById(R.id.web)
-        web1.webViewClient = WebViewClient()
+        web1.webViewClient = object: WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                val url = request?.url.toString()
+                if(url.startsWith("http://") ||
+                    url.startsWith("https://")) {
+                    return false;
+                }else {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW,
+                            Uri.parse(url))
+                        view?.context?.startActivity(intent)
+                    } catch (e: Exception){
+                        Toast.makeText(view?.context, "앱이 설치되지않았습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                    return true
+                }
+            }
+        }
+
+
         web1.loadUrl("https://www.google.co.kr")
         web1.settings.javaScriptEnabled = true
 
